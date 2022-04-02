@@ -155,7 +155,7 @@ static int internalGetBlackHeight(RBT Tree, Node x){
     int lh, rh, sum = 0;
 
     if(x == Tree->nil)
-        return 1;
+        return 0;
 
     lh = internalGetBlackHeight(Tree, x->left);
     rh = internalGetBlackHeight(Tree, x->right);
