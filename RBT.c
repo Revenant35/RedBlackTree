@@ -3,34 +3,35 @@
 
 #include "RBT.h"
 
+typedef struct node_struct *Node;
+
 struct node_struct {
     Node p, left, right;
     int key, size;
     bool color;
 };
 
-struct rbt_struct {
-    Node root, nil;
-};
-
 static Node createNode(int data){
     Node newNode;
     newNode = malloc(sizeof(*newNode));
-    newNode->p = newNode->left = newNode->right = NULL;
-    newNode->color = BLACK;
-    newNode->key = data;
-    newNode->size = 1;
+    *newNode = (struct node_struct){NULL, NULL, NULL, data, BLACK, 1};
     return newNode;
 }
 
-static int size(Node x){
-    if(!x || (!x->left && !x->right))
+static int Size(Node x){
+    if(!x->left && !x->right)
         return 0;
     return x->size;
 }
 
+
+
+struct rbt_struct {
+    Node root, nil;
+};
+
 static Node OS_Select(RBT Tree, Node x, int i){
-    int r = size(x->left) + 1;
+    int r = Size(x->left) + 1;
     if(i == r)
         return x;
     else if (i < r)
@@ -52,11 +53,12 @@ static void LeftRotate(RBT Tree, Node x){
         else
             x->p->right = y;
     }
-    y->size = size(x);
-    x->size = size(x->left) + size(x->right) + 1;
+    y->size = Size(x);
+    x->size = Size(x->left) + Size(x->right) + 1;
     y->left = x;
     x->p = y;
 }
+
 static void RightRotate(RBT Tree, Node x){
     Node y = x->left;
     x->left = y->right;
@@ -71,11 +73,12 @@ static void RightRotate(RBT Tree, Node x){
         else
             x->p->left = y;
     }
-    y->size = size(x);
-    x->size = size(x->left) + size(x->right) + 1;
+    y->size = Size(x);
+    x->size = Size(x->left) + Size(x->right) + 1;
     y->right = x;
     x->p = y;
 }
+
 static void RB_Insert_Fixup(RBT Tree, Node z){
     Node y;
     while(z->p->color == RED){
@@ -118,6 +121,16 @@ static void RB_Insert_Fixup(RBT Tree, Node z){
     Tree->root->color = BLACK;
 }
 
+static bool internal_RB_Search(RBT Tree, Node x, int data){
+    if(x == Tree->nil)
+        return false;
+    if(x->key == data)
+        return true;
+    if(data > x->key)
+        return internal_RB_Search(Tree, x->right, data);
+    return internal_RB_Search(Tree, x->left, data);
+}
+
 static void internalInorderPrint(RBT Tree, Node head){
     if(head == Tree->nil)
         return;
@@ -127,18 +140,45 @@ static void internalInorderPrint(RBT Tree, Node head){
     internalInorderPrint(Tree, head->right);
 }
 
-
-
-
-void inorderPrint(RBT Tree){
-    internalInorderPrint(Tree, Tree->root);
-    printf("\n");
+static int internalGetHeight(RBT Tree, Node x){
+    int lh, rh;
+    if(x == Tree->nil)
+        return 0;
+    if(x->left == Tree->nil && x->right == Tree->nil)
+        return 1;
+    lh = internalGetHeight(Tree, x->left);
+    rh = internalGetHeight(Tree, x->right);
+    return 1 + ((lh > rh) ? lh : rh);
 }
-int secondHighestNum(RBT Tree){
-    int i = size(Tree->root) - 1;
-    Node x = OS_Select(Tree, Tree->root, i);
-    return x->key;
+
+static int internalGetBlackHeight(RBT Tree, Node x){
+    int lh, rh, sum = 0;
+
+    if(x == Tree->nil)
+        return 1;
+
+    lh = internalGetBlackHeight(Tree, x->left);
+    rh = internalGetBlackHeight(Tree, x->right);
+
+    if(x->color == BLACK)
+        sum = 1;
+
+    if(lh == -1 || rh == -1 || lh != rh)
+        return -1;
+
+    return lh + sum;
 }
+
+static void internalClearRBT(RBT Tree, Node root){
+    if(root == Tree->nil)
+        return;
+    internalClearRBT(Tree, root->left);
+    internalClearRBT(Tree, root->right);
+    free(root);
+}
+
+
+
 RBT RB_Create(){
     RBT Tree;
     Tree = malloc(sizeof(*Tree));
@@ -146,6 +186,7 @@ RBT RB_Create(){
     Tree->nil->size = 0;
     return Tree;
 }
+
 void RB_Insert(RBT Tree, int data){
     Node y = Tree->nil;
     Node x = Tree->root;
@@ -172,4 +213,45 @@ void RB_Insert(RBT Tree, int data){
     z->right = Tree->nil;
     z->color = RED;
     RB_Insert_Fixup(Tree, z);
+}
+
+bool RB_Search(RBT Tree, int data){
+    return internal_RB_Search(Tree, Tree->root, data);
+}
+
+void RB_Clear(RBT Tree){
+    internalClearRBT(Tree, Tree->root);
+}
+
+
+
+void formatInorderPrint(RBT Tree){
+    printf("In-order traversal of the tree:");
+    if(Tree->root != Tree->nil)
+        printf("\n");
+    internalInorderPrint(Tree, Tree->root);
+    printf("\n\n");
+}
+
+void formatHeightPrint(RBT Tree){
+    int height = internalGetHeight(Tree, Tree->root);
+    printf("The height of the red and black tree is %d.\n\n", height);
+}
+
+void formatBlackHeightPrint(RBT Tree){
+    int black_height = internalGetBlackHeight(Tree, Tree->root);
+    if(black_height != -1)
+        printf("The black height of the red and black tree is %d.\n\n", black_height);
+}
+
+void formatPrintNthHighestNum(RBT Tree, int n){
+    int i = Size(Tree->root) - n + 1;
+    printf("The second largest element of the tree is ");
+    if(i > 0) {
+        Node x = OS_Select(Tree, Tree->root, i);
+        printf("%d", x->key);
+    } else {
+        printf("undefined");
+    }
+    printf(".\n\n");
 }
