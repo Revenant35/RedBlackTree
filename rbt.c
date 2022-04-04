@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "RBT.h"
+#include "rbt.h"
 
 #define Safe_Free(address) Internal_Safe_Free((void **) &(address))
 

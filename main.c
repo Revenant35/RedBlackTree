@@ -5,7 +5,7 @@
 #include <limits.h>
 #include <asm-generic/errno.h>
 #include <errno.h>
-#include "RBT.h"
+#include "rbt.h"
 
 #define BUFF_SIZE (64)
 #define OK       (0)
@@ -70,6 +70,9 @@ void run(){
 
     if(!Tree)
         return;
+
+    printf("Enter a list of integers seperated by newlines\n");
+    printf("Enter 'x' or 'X' to finish entering integers\n");
 
     while(true){
         switch(readLine(buf)){
