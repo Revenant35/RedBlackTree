@@ -16,13 +16,15 @@
 
 typedef struct rbt_struct *RBT;
 
-RBT RB_Create(); // O(1) Time Complexity
-void RB_Insert(RBT Tree, int data); // O(lg(n)) Time Complexity
-bool RB_Search(RBT Tree, int data); // O(lg(n)) Time Complexity
-void formatInorderPrint(RBT Tree); // O(n) Time Complexity
-void formatPrintNthHighestNum(RBT Tree, int n); // O(lg(n)) Time Complexity
-void formatHeightPrint(RBT Tree); // O(n) Time Complexity
-void formatBlackHeightPrint(RBT Tree); // O(n) Time Complexity
-void RB_Clear(RBT Tree); // O(n) Time Complexity
+RBT RB_Create();
+void RB_Insert(RBT Tree, int data);
+bool RB_Search(RBT Tree, int data);
+void RB_Clear(RBT Tree);
+void RB_Free(RBT Tree);
+void Format_Inorder_Print(RBT Tree);
+void Format_Height_Print(RBT Tree);
+void Format_Black_Height_Print(RBT Tree);
+void Format_Print_Nth_Highest_Num(RBT Tree, int n);
+
 
 #endif //REDBLACKTREE_RBT_H
