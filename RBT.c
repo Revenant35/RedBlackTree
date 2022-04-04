@@ -254,13 +254,33 @@ void Format_Black_Height_Print(RBT Tree){
 }
 
 void Format_Print_Nth_Highest_Num(RBT Tree, int n){
+    char *ordinal;
+
+    switch(n % 10){
+        case 1:
+            ordinal = "st";
+            break;
+        case 2:
+            ordinal = "nd";
+            break;
+        case 3:
+            ordinal = "rd";
+            break;
+        default:
+            ordinal = "th";
+            break;
+    }
+
     int i = Tree->root->size - n + 1;
-    printf("The second largest element of the tree is ");
+
+    printf("The %d%s largest element of the tree is ", n, ordinal);
+
     if(i > 0) {
         Node x = OS_Select(Tree, Tree->root, i);
         printf("%d", x->key);
     } else {
         printf("undefined");
     }
-    printf(".\n\n");
+
+    printf(".\n");
 }
